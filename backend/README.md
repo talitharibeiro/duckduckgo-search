@@ -102,7 +102,7 @@ curl http://localhost:3000/search/history
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/talitharibeiro/duckduckgo-search
    ```
 
 2. Navigate to the backend directory:
