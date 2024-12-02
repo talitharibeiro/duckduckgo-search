@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getHistory, searchApi } from "../../../services/api";
 import { ISearchResults } from "../../../interfaces/ISearchResults";
+import { getHistory, searchApi } from "../../../services/api";
 
 interface IUseHome {
   query: string;
@@ -15,6 +15,7 @@ interface IUseHome {
   handleHistoryClick: (item: string) => Promise<void>;
   resultsPerPage: number;
 }
+
 export const useHome = (): IUseHome => {
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<ISearchResults[]>([]);
@@ -38,11 +39,15 @@ export const useHome = (): IUseHome => {
     setResults(data.results);
     setTotalPages(Math.ceil(data.totalResults / resultsPerPage));
     setCurrentPage(page);
+
+    // Atualiza o histórico após a busca
+    const updatedHistory = await getHistory();
+    setHistory(updatedHistory);
   };
 
   const handleHistoryClick = async (item: string) => {
-    setQuery(item);
-    await handleSearch(1, item); // Reset to first page when clicking history
+    setQuery(item); // Atualiza o estado para refletir no input
+    await handleSearch(1, item); // Passa o termo diretamente para handleSearch
   };
 
   useEffect(() => {
