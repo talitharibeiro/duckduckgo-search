@@ -4,7 +4,7 @@ interface SearchBarProps {
   query: string;
   setQuery: (value: string) => void;
   onSearch: () => void;
-  clearResults: () => void; // Nova função para limpar resultados
+  clearResults: () => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -16,7 +16,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      onSearch();
+      if (query.trim()) {
+        onSearch();
+      }
     }
   };
 
@@ -27,7 +29,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch();
+    if (query.trim()) {
+      onSearch();
+    }
   };
 
   return (
@@ -40,12 +44,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onKeyDown={handleKeyPress}
           placeholder="Enter search term..."
           className="border rounded-md p-2 w-full pr-10"
+          aria-label="Search input"
         />
         {query && (
           <button
             type="button"
             onClick={clearQuery}
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-500 hover:text-red-500 transition duration-200"
+            aria-label="Clear search input"
           >
             ✖
           </button>
@@ -53,7 +59,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       </div>
       <button
         type="submit"
-        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md"
+        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
+        aria-label="Submit search"
       >
         Search
       </button>
