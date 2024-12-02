@@ -17,25 +17,29 @@ export class SearchService {
   constructor(private readonly httpService: HttpService) {}
 
   // Method to do a search on DuckDuckGo
-  async searchDuckDuckGo(
-    query: string,
-  ): Promise<{ title: string; url: string }[]> {
+  async searchDuckDuckGo(query: string, offset: number, limit: number) {
     const url = `${this.apiUrl}?q=${query}&format=json`;
+    const response = await lastValueFrom(this.httpService.get(url));
 
-    try {
-      const response = await lastValueFrom(this.httpService.get(url));
-      const results = response.data.RelatedTopics.map((item) => ({
-        title: item.Text,
-        url: item.FirstURL,
-      }));
+    const allResults = response.data.RelatedTopics.map((item) => {
+      if (item.Text && item.FirstURL) {
+        return {
+          title: item.Text,
+          url: item.FirstURL,
+        };
+      }
+      return null;
+    }).filter((item) => item !== null);
 
-      // Save the query to the history
-      this.saveQueryToHistory(query);
+    // Ensure offset and limit are within bounds
+    const paginatedResults = allResults.slice(offset, offset + limit);
 
-      return results;
-    } catch (error) {
-      throw new Error('Error fetching data from DuckDuckGo API');
-    }
+    this.saveQueryToHistory(query);
+
+    return {
+      results: paginatedResults,
+      totalResults: allResults.length,
+    };
   }
 
   // Method to save a query to the history

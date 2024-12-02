@@ -18,8 +18,14 @@ export class SearchController {
    * Performs a search using the DuckDuckGo API with a query parameter `q`.
    */
   @Get()
-  async search(@Query('q') query: string) {
-    return this.searchService.searchDuckDuckGo(query);
+  async search(
+    @Query('q') query: string,
+    @Query('offset') offset: string = '',
+    @Query('limit') limit: string = '',
+  ) {
+    const offsetNum = parseInt(offset, 10);
+    const limitNum = parseInt(limit, 10);
+    return this.searchService.searchDuckDuckGo(query, offsetNum, limitNum);
   }
 
   /**
@@ -28,7 +34,8 @@ export class SearchController {
    */
   @Post()
   async searchWithBody(@Body(new ValidationPipe()) body: SearchQueryDto) {
-    return this.searchService.searchDuckDuckGo(body.query);
+    const { query, offset = 0, limit = 10 } = body;
+    return this.searchService.searchDuckDuckGo(query, offset, limit);
   }
 
   /**

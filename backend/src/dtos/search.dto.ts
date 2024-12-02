@@ -4,4 +4,6 @@ export class SearchQueryDto {
   @IsString()
   @IsNotEmpty()
   query: string;
+  offset: number;
+  limit: number;
 }
