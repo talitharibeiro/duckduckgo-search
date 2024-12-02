@@ -2,11 +2,11 @@ import React from "react";
 import { ISearchResults } from "../../interfaces/ISearchResults";
 
 interface SearchResultsProps {
-  results: ISearchResults[]; // Results for the current page
-  currentPage: number; // Current active page
-  totalPages: number; // Total number of pages
-  onPageChange: (page: number) => void; // Callback to change the page
-  searchTerm: string; // Term being searched (for highlight)
+  results: ISearchResults[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  searchTerm: string;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({
@@ -17,9 +17,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   searchTerm,
 }) => {
   // Filter valid results
-  const validResults = results.filter((result) => result.title && result.url);
+  const validResults = results.filter((result) => result.url);
 
-  // Text highlights
+  // Highlight search term in text
   const highlightText = (text: string, highlight: string) => {
     if (!highlight.trim()) return text;
 
@@ -45,14 +45,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       ) : (
         <ul className="mt-2">
           {validResults.map((result, index) => (
-            <li key={index} className="my-2">
+            <li key={result.url || index} className="my-2">
               <a
                 href={result.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 underline"
+                className="text-blue-500 underline hover:text-blue-700"
+                aria-label={`Link to ${result.title || "untitled"}`}
               >
-                {highlightText(result.title, searchTerm)}
+                {highlightText(result.title || "Untitled", searchTerm)}
               </a>
             </li>
           ))}
@@ -64,13 +65,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <div className="mt-4 flex justify-center">
           {Array.from({ length: totalPages }, (_, index) => (
             <button
-              key={index}
+              key={`page-${index + 1}`}
               onClick={() => onPageChange(index + 1)}
               className={`mx-1 px-3 py-1 border rounded ${
                 currentPage === index + 1
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
-              }`}
+                  : "bg-gray-200 hover:bg-gray-300"
+              } transition duration-200`}
+              aria-label={`Go to page ${index + 1}`}
             >
               {index + 1}
             </button>
