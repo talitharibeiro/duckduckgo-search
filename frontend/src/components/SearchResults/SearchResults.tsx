@@ -19,6 +19,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   // Filter valid results
   const validResults = results.filter((result) => result.title && result.url);
 
+  // Text highlights
   const highlightText = (text: string, highlight: string) => {
     if (!highlight.trim()) return text;
 
@@ -59,21 +60,23 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       )}
 
       {/* Pagination Controls */}
-      <div className="mt-4 flex justify-center">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => onPageChange(index + 1)}
-            className={`mx-1 px-3 py-1 border rounded ${
-              currentPage === index + 1
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      {validResults.length > 0 && (
+        <div className="mt-4 flex justify-center">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => onPageChange(index + 1)}
+              className={`mx-1 px-3 py-1 border rounded ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

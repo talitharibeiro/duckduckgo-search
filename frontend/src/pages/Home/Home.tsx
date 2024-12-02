@@ -13,33 +13,45 @@ const Home: React.FC = () => {
     results,
     totalPages,
     currentPage,
+    setHistory,
     setResults,
     handleHistoryClick,
+    clearHistory,
   } = useHome();
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">DuckDuckGo Search</h1>
+    <div className="container mx-auto p-4 gap-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">DuckDuckGo Search</h1>
 
-      {/* Search Bar */}
-      <SearchBar
-        query={query}
-        setQuery={setQuery}
-        onSearch={() => handleSearch(1)}
-        clearResults={() => setResults([])} // Limpa os resultados
-      />
+      <div className="flex items-start gap-6">
+        {/* Sidebar */}
+        <div className="col-span-1">
+          <HistorySidebar
+            onClearHistory={clearHistory}
+            history={history}
+            onItemClick={handleHistoryClick}
+          />
+        </div>
 
-      {/* Search Results */}
-      <SearchResults
-        results={results}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handleSearch}
-        searchTerm={query}
-      />
+        <div className="flex flex-col flex-1">
+          {/* Search Bar */}
+          <SearchBar
+            query={query}
+            setQuery={setQuery}
+            onSearch={() => handleSearch(1)}
+            clearResults={() => setResults([])}
+          />
 
-      {/* Search History Sidebar */}
-      <HistorySidebar history={history} onItemClick={handleHistoryClick} />
+          {/* Search Results */}
+          <SearchResults
+            results={results}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handleSearch}
+            searchTerm={query}
+          />
+        </div>
+      </div>
     </div>
   );
 };

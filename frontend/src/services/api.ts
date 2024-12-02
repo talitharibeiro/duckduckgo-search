@@ -13,3 +13,7 @@ export const getHistory = async () => {
   const response = await axios.get(`${API_URL}/history`);
   return response.data;
 };
+
+export const clearHistoryApi = async () => {
+  await axios.delete(`${API_URL}/history`);
+};

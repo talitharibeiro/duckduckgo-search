@@ -21,8 +21,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const clearQuery = () => {
-    setQuery(""); // Limpa o campo de busca
-    clearResults(); // Limpa os resultados
+    setQuery("");
+    clearResults();
   };
 
   const handleSubmit = (e: React.FormEvent) => {

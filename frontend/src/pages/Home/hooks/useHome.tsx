@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ISearchResults } from "../../../interfaces/ISearchResults";
-import { getHistory, searchApi } from "../../../services/api";
+import { clearHistoryApi, getHistory, searchApi } from "../../../services/api";
 
 interface IUseHome {
   query: string;
@@ -14,6 +14,7 @@ interface IUseHome {
   totalPages: number;
   handleHistoryClick: (item: string) => Promise<void>;
   resultsPerPage: number;
+  clearHistory: () => Promise<void>;
 }
 
 export const useHome = (): IUseHome => {
@@ -40,21 +41,27 @@ export const useHome = (): IUseHome => {
     setTotalPages(Math.ceil(data.totalResults / resultsPerPage));
     setCurrentPage(page);
 
-    // Atualiza o histórico após a busca
+    // Update history
     const updatedHistory = await getHistory();
     setHistory(updatedHistory);
   };
 
   const handleHistoryClick = async (item: string) => {
-    setQuery(item); // Atualiza o estado para refletir no input
-    await handleSearch(1, item); // Passa o termo diretamente para handleSearch
+    setQuery(item); // Update input state
+    await handleSearch(1, item);
+  };
+
+  const clearHistory = async () => {
+    await clearHistoryApi(); // Delete history in backend
+    setHistory([]); // Updates frontend state
+  };
+
+  const fetchHistory = async () => {
+    const historyData = await getHistory();
+    setHistory(historyData);
   };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      const historyData = await getHistory();
-      setHistory(historyData);
-    };
     fetchHistory();
   }, []);
 
@@ -70,5 +77,6 @@ export const useHome = (): IUseHome => {
     totalPages,
     handleHistoryClick,
     resultsPerPage,
+    clearHistory,
   };
 };
