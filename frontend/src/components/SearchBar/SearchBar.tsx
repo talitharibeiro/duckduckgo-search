@@ -4,9 +4,15 @@ interface SearchBarProps {
   query: string;
   setQuery: (value: string) => void;
   onSearch: () => void;
+  clearResults: () => void; // Nova função para limpar resultados
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ query, setQuery, onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  query,
+  setQuery,
+  onSearch,
+  clearResults,
+}) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -15,7 +21,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, setQuery, onSearch }) => {
   };
 
   const clearQuery = () => {
-    setQuery("");
+    setQuery(""); // Limpa o campo de busca
+    clearResults(); // Limpa os resultados
   };
 
   const handleSubmit = (e: React.FormEvent) => {

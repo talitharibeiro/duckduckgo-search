@@ -16,7 +16,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   onPageChange,
   searchTerm,
 }) => {
-  // Filtrar resultados inválidos
+  // Filter valid results
   const validResults = results.filter((result) => result.title && result.url);
 
   const highlightText = (text: string, highlight: string) => {
