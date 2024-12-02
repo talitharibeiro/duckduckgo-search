@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -21,11 +22,16 @@ export class SearchController {
   @Get()
   async search(
     @Query('q') query: string,
-    @Query('offset') offset: string = '',
-    @Query('limit') limit: string = '',
+    @Query('offset') offset: string = '0',
+    @Query('limit') limit: string = '10',
   ) {
-    const offsetNum = parseInt(offset, 10);
-    const limitNum = parseInt(limit, 10);
+    if (!query || query.trim() === '') {
+      throw new BadRequestException('Query parameter "q" is required');
+    }
+
+    const offsetNum = isNaN(parseInt(offset, 10)) ? 0 : parseInt(offset, 10);
+    const limitNum = isNaN(parseInt(limit, 10)) ? 10 : parseInt(limit, 10);
+
     return this.searchService.searchDuckDuckGo(query, offsetNum, limitNum);
   }
 
