@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import * as fs from 'fs';
@@ -14,57 +14,79 @@ export class SearchService {
     'query-history.json',
   );
 
+  private readonly logger = new Logger(SearchService.name);
+
   constructor(private readonly httpService: HttpService) {}
 
-  // Method to do a search on DuckDuckGo
+  /**
+   * Method to perform a search on DuckDuckGo
+   */
   async searchDuckDuckGo(query: string, offset: number, limit: number) {
+    if (!query.trim()) {
+      throw new BadRequestException('Query cannot be empty');
+    }
+
     const url = `${this.apiUrl}?q=${query}&format=json`;
-    const response = await lastValueFrom(this.httpService.get(url));
 
-    const allResults = response.data.RelatedTopics.map((item) => {
-      if (item.Text && item.FirstURL) {
-        return {
-          title: item.Text,
-          url: item.FirstURL,
-        };
-      }
-      return null;
-    }).filter((item) => item !== null);
+    try {
+      const response = await lastValueFrom(this.httpService.get(url));
 
-    // Ensure offset and limit are within bounds
-    const paginatedResults = allResults.slice(offset, offset + limit);
+      const allResults = response.data.RelatedTopics.map((item) => {
+        if (item.Text && item.FirstURL) {
+          return {
+            title: item.Text,
+            url: item.FirstURL,
+          };
+        }
+        return null;
+      }).filter((item) => item !== null);
 
-    this.saveQueryToHistory(query);
+      // Ensure offset and limit are within bounds
+      const paginatedResults = allResults.slice(offset, offset + limit);
 
-    return {
-      results: paginatedResults,
-      totalResults: allResults.length,
-    };
+      this.saveQueryToHistory(query);
+
+      return {
+        results: paginatedResults,
+        totalResults: allResults.length,
+      };
+    } catch (error) {
+      this.logger.error('Error fetching data from DuckDuckGo API', error.stack);
+      throw new BadRequestException('Failed to fetch data from DuckDuckGo API');
+    }
   }
 
-  // Method to save a query to the history
+  /**
+   * Save a query to the history file
+   */
   private saveQueryToHistory(query: string): void {
-    const history = this.getHistory();
+    try {
+      const history = this.getHistory();
 
-    if (!history.includes(query)) {
-      history.push(query);
+      if (!history.includes(query)) {
+        history.push(query);
+      }
+
+      // Ensure the directory exists before saving
+      const dirPath = path.dirname(this.historyFilePath);
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+      }
+
+      // Write the updated history to the JSON file
+      fs.writeFileSync(
+        this.historyFilePath,
+        JSON.stringify(history, null, 2),
+        'utf8',
+      );
+    } catch (error) {
+      this.logger.error('Error saving query to history', error.stack);
     }
-
-    // Ensure the directory exists before saving
-    const dirPath = path.dirname(this.historyFilePath);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-
-    // Write the updated history to the JSON file
-    fs.writeFileSync(
-      this.historyFilePath,
-      JSON.stringify(history, null, 2),
-      'utf8',
-    );
   }
 
-  // Method to get the search history
+  /**
+   * Retrieve the search history from the file
+   */
   getHistory(): string[] {
     try {
       if (fs.existsSync(this.historyFilePath)) {
@@ -73,12 +95,14 @@ export class SearchService {
       }
       return [];
     } catch (error) {
-      console.error('Error reading history file:', error);
+      this.logger.error('Error reading history file', error.stack);
       return [];
     }
   }
 
-  // Method to clean the search history
+  /**
+   * Clear the search history
+   */
   clearHistory(): void {
     try {
       if (fs.existsSync(this.historyFilePath)) {
@@ -89,7 +113,7 @@ export class SearchService {
         );
       }
     } catch (error) {
-      console.error('Error clearing history file:', error);
+      this.logger.error('Error clearing history file', error.stack);
     }
   }
 }
