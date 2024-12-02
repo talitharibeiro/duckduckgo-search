@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
@@ -45,5 +46,15 @@ export class SearchController {
   @Get('history')
   getHistory() {
     return this.searchService.getHistory();
+  }
+
+  /**
+   * DELETE /search/history
+   * Delete the search history stored in the server.
+   */
+  @Delete('history')
+  clearHistory() {
+    this.searchService.clearHistory();
+    return { message: 'Search history cleared successfully' };
   }
 }

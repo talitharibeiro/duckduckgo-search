@@ -77,4 +77,19 @@ export class SearchService {
       return [];
     }
   }
+
+  // Method to clean the search history
+  clearHistory(): void {
+    try {
+      if (fs.existsSync(this.historyFilePath)) {
+        fs.writeFileSync(
+          this.historyFilePath,
+          JSON.stringify([], null, 2),
+          'utf8',
+        );
+      }
+    } catch (error) {
+      console.error('Error clearing history file:', error);
+    }
+  }
 }
