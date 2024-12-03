@@ -1,11 +1,12 @@
 # DuckDuckGo Search API Proxy
 
-This is a backend application built with **NestJS** that acts as a proxy for the DuckDuckGo API. It allows users to perform searches and stores the search history in a JSON file for persistence. The application is designed to be modular and scalable, supporting both `GET` and `POST` search requests.
+This is a backend application built with **NestJS** that acts as a proxy for the DuckDuckGo API. It allows users to perform searches and stores the search history in a JSON file for persistence. The application is designed to be modular and scalable, supporting `GET`, `POST`, and `DELETE` requests for search and history management.
 
 ## Features
 
 - **Search DuckDuckGo**: Perform searches via the DuckDuckGo API.
-- **Search History**: Save and retrieve search history.
+- **Search History**: Save, retrieve, and clear search history.
+- **Pagination**: Supports pagination for search results.
 - **Persistence**: Stores the search history in a JSON file (`query-history.json`) to ensure data is not lost after server restarts.
 
 ## Endpoints
@@ -16,27 +17,32 @@ Performs a search using the DuckDuckGo API.
 
 **Query Parameters:**
 
-- `q` (string): The search term.
+- `q` (string): The search term (required).
+- `offset` (number): The starting point for pagination (optional, default: `0`).
+- `limit` (number): The number of results to return (optional, default: `10`).
 
 **Example:**
 
 ```bash
-curl http://localhost:3000/search?q=example
+curl "http://localhost:3000/search?q=example&offset=0&limit=5"
 ```
 
 **Response:**
 
 ```json
-[
-  {
-    "title": "Example Domain",
-    "url": "https://example.com"
-  },
-  {
-    "title": "Example 2",
-    "url": "https://example2.com"
-  }
-]
+{
+  "results": [
+    {
+      "title": "Example Domain",
+      "url": "https://example.com"
+    },
+    {
+      "title": "Example 2",
+      "url": "https://example2.com"
+    }
+  ],
+  "totalResults": 50
+}
 ```
 
 ### `POST /search`
@@ -47,31 +53,34 @@ Performs a search using the DuckDuckGo API. The search term is provided in the r
 
 ```json
 {
-  "query": "example"
+  "query": "example",
+  "offset": 0,
+  "limit": 5
 }
 ```
 
 **Example:**
 
 ```bash
-curl -X POST http://localhost:3000/search \
--H "Content-Type: application/json" \
--d '{"query": "example"}'
+curl -X POST http://localhost:3000/search -H "Content-Type: application/json" -d '{"query": "example", "offset": 0, "limit": 5}'
 ```
 
 **Response:**
 
 ```json
-[
-  {
-    "title": "Example Domain",
-    "url": "https://example.com"
-  },
-  {
-    "title": "Example 2",
-    "url": "https://example2.com"
-  }
-]
+{
+  "results": [
+    {
+      "title": "Example Domain",
+      "url": "https://example.com"
+    },
+    {
+      "title": "Example 2",
+      "url": "https://example2.com"
+    }
+  ],
+  "totalResults": 50
+}
 ```
 
 ### `GET /search/history`
@@ -88,6 +97,24 @@ curl http://localhost:3000/search/history
 
 ```json
 ["example", "example query", "another search"]
+```
+
+### `DELETE /search/history`
+
+Clears the search history.
+
+**Example:**
+
+```bash
+curl -X DELETE http://localhost:3000/search/history
+```
+
+**Response:**
+
+```json
+{
+  "message": "Search history cleared successfully"
+}
 ```
 
 ## Installation
@@ -150,4 +177,3 @@ None required for this project. The API URL is hardcoded (`http://api.duckduckgo
 ## Notes
 
 - The search history is saved in `query-history.json` under the `history` directory. If this directory does not exist, it will be created automatically.
-- The backend is modular and can be extended to include additional features like user authentication or advanced search filtering.
