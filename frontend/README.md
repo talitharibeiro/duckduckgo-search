@@ -48,9 +48,16 @@ This project is a React-based frontend application that integrates with a backen
    ```
 
 3. **Configure Backend API**:
-   Ensure the backend API is running on `http://localhost:3000` or update the base URL in `src/services/api.ts` if necessary.
+   Ensure the backend API is running on `http://localhost:3000`
 
-4. **Start the Development Server**:
+4. **Configure Environment**:
+
+   ```env
+      REACT_APP_API_BASE_URL=http://localhost:3000
+      PORT=3001
+   ```
+
+5. **Start the Server**:
 
    ```bash
    npm start
@@ -58,7 +65,7 @@ This project is a React-based frontend application that integrates with a backen
    yarn start
    ```
 
-5. **Access the Application**:
+6. **Access the Application**:
    Open your browser and navigate to `http://localhost:3001` (or the configured port).
 
 ---
@@ -95,17 +102,6 @@ Runs the test suite.
 ### `npm build`
 
 Builds the app for production to the `build` folder.
-
----
-
-## Environment Variables
-
-You can create a `.env` file in the root directory and set the following variables:
-
-```env
-REACT_APP_API_BASE_URL=http://localhost:3000
-PORT=3001
-```
 
 ---
 
