@@ -17,48 +17,56 @@ interface IUseHome {
   clearHistory: () => Promise<void>;
 }
 
+const RESULTS_PER_PAGE = 5;
+
 export const useHome = (): IUseHome => {
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<ISearchResults[]>([]);
   const [history, setHistory] = useState<Array<string>>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const resultsPerPage = 5;
 
   const handleSearch = async (
     page: number = 1,
     searchQuery: string = query
   ) => {
-    if (!searchQuery.trim()) {
-      alert("Please enter a search term!");
-      return;
+    try {
+      const offset = (page - 1) * RESULTS_PER_PAGE;
+      const data = await searchApi(searchQuery, offset, RESULTS_PER_PAGE);
+
+      setResults(data.results);
+      setTotalPages(Math.ceil(data.totalResults / RESULTS_PER_PAGE));
+      setCurrentPage(page);
+
+      // Update history
+      const updatedHistory = await getHistory();
+      setHistory(updatedHistory);
+    } catch (error) {
+      console.error("Error during search:", error);
     }
-
-    const offset = (page - 1) * resultsPerPage;
-    const data = await searchApi(searchQuery, offset, resultsPerPage);
-
-    setResults(data.results);
-    setTotalPages(Math.ceil(data.totalResults / resultsPerPage));
-    setCurrentPage(page);
-
-    // Update history
-    const updatedHistory = await getHistory();
-    setHistory(updatedHistory);
   };
 
   const handleHistoryClick = async (item: string) => {
-    setQuery(item); // Update input state
+    setQuery(item);
     await handleSearch(1, item);
   };
 
   const clearHistory = async () => {
-    await clearHistoryApi(); // Delete history in backend
-    setHistory([]); // Updates frontend state
+    try {
+      await clearHistoryApi();
+      setHistory([]);
+    } catch (error) {
+      console.error("Error clearing history:", error);
+    }
   };
 
   const fetchHistory = async () => {
-    const historyData = await getHistory();
-    setHistory(historyData);
+    try {
+      const historyData = await getHistory();
+      setHistory(historyData);
+    } catch (error) {
+      console.error("Error fetching history:", error);
+    }
   };
 
   useEffect(() => {
@@ -76,7 +84,7 @@ export const useHome = (): IUseHome => {
     currentPage,
     totalPages,
     handleHistoryClick,
-    resultsPerPage,
+    resultsPerPage: RESULTS_PER_PAGE,
     clearHistory,
   };
 };
