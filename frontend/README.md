@@ -132,9 +132,3 @@ PORT=3001
 ### 5. **Clear Functionality**
 
 - Clear the search input and results using the "✖" button.
-
----
-
-## Contact
-
-For any questions or issues, feel free to reach out at [talitha.reclaim@gmail.com].
