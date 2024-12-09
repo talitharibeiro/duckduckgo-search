@@ -35,7 +35,7 @@ This project is a React-based frontend application that integrates with a backen
 1. **Clone the Repository**:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/talitharibeiro/duckduckgo-search
    cd frontend
    ```
 
